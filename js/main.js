@@ -1,39 +1,48 @@
-import { setSearchFocus } from "./searchBar.js"
-import { getSearchTerm } from "./dataFunctions.js"
-import { retrieveSearchResults } from "./dataFunctions.js"
-
-document.addEventListener("readystatechange", (event) => {
+import {
+    setSearchFocus,
+    showClearTextButton,
+    clearSearchText,
+    clearPushListener
+  } from "./searchBar.js";
+  import {
+    deleteSearchResults,
+    buildSearchResults,
+    clearStatsLine,
+    setStatsLine
+  } from "./searchResults.js";
+  import { getSearchTerm, retrieveSearchResults } from "./dataFunctions.js";
+  
+  document.addEventListener("readystatechange", (event) => {
     if (event.target.readyState === "complete") {
-        initApp();
+      initApp();
     }
-});
-
-const initApp = () => {
-    //set the focus
+  });
+  
+  const initApp = () => {
     setSearchFocus();
-    // TODO: 3 listeners clear text
-
+    const search = document.getElementById("search");
+    search.addEventListener("input", showClearTextButton);
+    const clear = document.getElementById("clear");
+    clear.addEventListener("click", clearSearchText);
+    clear.addEventListener("keydown", clearPushListener);
     const form = document.getElementById("searchBar");
     form.addEventListener("submit", submitTheSearch);
-}
-
-// Procedural "workflow" function
-const submitTheSearch = (event) => {
+  };
+  
+  // Procedural "workflow" function
+  const submitTheSearch = (event) => {
     event.preventDefault();
-    // TODO: delete search results
-    // process the search
+    deleteSearchResults();
     processTheSearch();
-    // set the focus
     setSearchFocus();
-};
-
-// Procedural
-const processTheSearch = async () => {
-    // TODO: clear the stats line
+  };
+  
+  // Procedural
+  const processTheSearch = async () => {
+    clearStatsLine();
     const searchTerm = getSearchTerm();
     if (searchTerm === "") return;
     const resultArray = await retrieveSearchResults(searchTerm);
-    if (resultArray.length) // TODO: build search results
-    // TODO: set stats line
-
-};
+    if (resultArray.length) buildSearchResults(resultArray);
+    setStatsLine(resultArray.length);
+  };
